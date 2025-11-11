@@ -4,6 +4,6 @@
   2 State Key Laboratory of Acoustics and Marine Information, Institute of Acoustics, Chinese Academy of Sciences, Beijing 100190, P.R. China  
   3 Department of Biomedical Engineering, The Hong Kong Polytechnic University, Hung Hom, Hong Kong SAR 999077, P.R. China   
 
-  data and code used in the paper named "Miniaturized-and-accessible-functional-ultrasound-imaging-system-for-freely-moving-mice"  
+  The codes used in the paper named "Miniaturized-and-accessible-functional-ultrasound-imaging-system-for-freely-moving-mice"  
 
-  The code was developed and debugged on MATLAB 2022a  
+  The codes were developed and debugged on MATLAB 2022a  
