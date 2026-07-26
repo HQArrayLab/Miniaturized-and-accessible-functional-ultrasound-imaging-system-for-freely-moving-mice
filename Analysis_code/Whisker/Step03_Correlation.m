@@ -2,19 +2,19 @@
 %% Perform Pearson's correlation on whisker_dataset 
 
 clear;
-load Data\scanAverage.mat; 
+load Data\average.mat; 
 load Data\dataAtlas.mat;
-slice=149;
+slice=139;
 lamda=1540/15e6;
-dx=(lamda/3*1e3);
-dz=(lamda/4*1e3);
-scanfus.Data=scanfus.Data;
-Z=(scanfus.VoxelSize(1)/1e3)*[0:1:size(scanfus.Data,1)-1];
-X=(scanfus.VoxelSize(2)/1e3)*[-size(scanfus.Data,2)/2+0.5:1:size(scanfus.Data,2)/2-0.5];
+dx=(0.05);
+dz=(0.05);
+scanfus.Data=Data(55:end,15:end,:);
+Z=(0.05)*[0:1:size(scanfus.Data,1)-1];
+X=(0.05)*[-size(scanfus.Data,2)/2+0.5:1:size(scanfus.Data,2)/2-0.5];
 range=[min(X) max(X) min(Z) max(Z)];
 
-T1= floor(5*3.57);         % Start of the stimulus.
-T2= floor(36*3.57);          % End of the stimulus.
+T1= floor(20*3.57);         % Start of the stimulus.
+T2= floor(40*3.57);          % End of the stimulus.
 mapOriginal=mapCorrelation(scanfus, T1, T2);
 mapOriginal.Data(find(mapOriginal.Data<0.23))=0;
 
@@ -22,13 +22,12 @@ mapOriginal.Data(find(mapOriginal.Data<0.23))=0;
 close all
 figure(1);
 [nz,nx,np,nt]=size(scanfus.Data); % data dimensions
-temp=mean(squeeze(scanfus.Data(:,:,1,:)),3);
+temp=mean(squeeze(scanfus.Data(:,:,:)),3);
 imagesc(X,Z,(temp.^0.25)./max(temp(:))); 
 hold on
-addLines(LinReg.Cor,slice,X,Z,1.05,-1.55,1.00,0.05,dx,dz);
 axis('equal','tight');
 axis off;
-axis(range)
+% axis(range)
 colormap hot;
 colorbar
 title('Brain image');
@@ -38,30 +37,59 @@ hold off
 p=1.4;
 figure(2)
 
-Doppler=scanfus.Data(:,:,1,:);
-DopplerM = mean(Doppler,4);
-DopplerFrame=sqrt(DopplerM(:,:,1));
-DopplerFrame=DopplerFrame-min(DopplerFrame(:));
-DopplerFrame=DopplerFrame./max(DopplerFrame(:));
-DopplerFrame(find(isnan(DopplerFrame)))=0;
-VesselsRGB=ind2rgb(1+floor(127*DopplerFrame),gray(128));
-bg=imagesc(X,Z,VesselsRGB);
+Doppler=scanfus.Data(:,:,:);
+DopplerM = mean(Doppler,3);
+DopplerFrame=DopplerM.^0.16;
 
-hold on
+ax1 = axes;
+VesselsRGB=DopplerFrame;
+bg=imagesc(ax1,X,Z,VesselsRGB);
+colormap(ax1, 'gray');
+axis(ax1, 'image', 'off');
 
-fg=imagesc(X,Z,mapOriginal.Data(:,:,1));
-alpha(fg,abs(mapOriginal.Data(:,:,1)).^p)
-caxis([0 1.2]);
-colormap hot;
-colorbar('Color',[0 0 0]);
-set(gca,'XColor',[0 0 0],'YColor',[0 0 0],'ZColor',[0 0 0],'Color',[0 0 0]);
-axis equal tight
-axis off
-axis(range)
 
+ax2 = axes;
+fg=imagesc(ax2,X,Z,mapOriginal.Data(:,:,1));
+
+colormap(ax2, 'hot');
+axis(ax2, 'image', 'off');
+clim(ax2, [0 1]);
+
+% 透明叠加设置
+fg.AlphaData = abs(mapOriginal.Data(:,:,1)).^p;
+
+ % 确保 ax2 的背景透明
+ax2.Color = 'none'; 
+
+cb = colorbar(ax2);
+cb.Label.String = 'Correlation Coefficient';
+cb.FontSize=18;
+
+% 同步底层图像和顶层图像的位置
+drawnow;
+ax1.Position = ax2.Position;
     
-addLines(LinReg.Cor,slice,X,Z,1.05,-1.55,1.00,0.05,dx,dz);
-title('Correlation map');
+% 链接坐标轴
+linkaxes([ax1, ax2]);
+    
+addLines(LinReg.Cor,slice,X,Z,0.95,-1.75,1.10,-0.00,dx,dz);
+% title('Correlation map');
+
+%% bar
+hold on
+x1 = -2.5; x2 = -1.5;
+line_y = 5.5 ;
+short_line_height = 0.3 ;
+
+% 横线
+plot([x1 x2], [line_y line_y], 'w', 'LineWidth', 2);
+
+text(mean([x1 x2]), line_y+0.5, '1mm', ...
+        'FontSize', 16, 'FontWeight','bold','Color','w','HorizontalAlignment', 'center', 'VerticalAlignment', 'bottom');
+
+grid off
+hold off
+set(gca,'Fontsize',18)
 hold off
 
 %% atlas
@@ -70,22 +98,18 @@ function h = addLines(LL, ip, X,Z,xk,xb,yk,yb,dx,dz)
     hold on;
     nb = length(L);
     h = gobjects(nb, 1);
-    bian=L{4};
+    bian=L{2};
     SIZE=max(bian)-min(bian);
-    rx=(2*SIZE(2)/3)./185;
-    ry=(SIZE(1))./251;
-%     rx=1.65
-%     ry=1.65
+    rx=(2*SIZE(2)/3)./127
+    ry=SIZE(1)./113
     for ib = 2:nb
         x = L{ib};
         xx=x(:, 2)*dx./rx+X(1);
         yy=x(:, 1)./ry*dz+Z(1);
         xx=xx.*xk+xb;
         yy=yy.*yk+yb;
-       h(ib) = plot(xx,yy, 'w:','MarkerSize',30,'LineWidth',1.5);   
+       h(ib) = plot(xx,yy, 'w:','MarkerSize',30,'LineWidth',1,'LineStyle','--');   %video
     end
-
-    hold off
 end
 
 

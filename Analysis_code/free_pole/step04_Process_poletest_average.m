@@ -1,6 +1,6 @@
 clear;
 clc;
-load data_temp\Data_singletrials_correct.mat;
+load Data\Data_singletrials_correct.mat;
 
 Data=Data_cor_1;
 

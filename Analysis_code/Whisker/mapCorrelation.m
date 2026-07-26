@@ -16,7 +16,7 @@
 % example: example03_correlation
 %%
 function c=mapCorrelation(scanfus,t0,t1)
-[nz,nx,ny,nt]=size(scanfus.Data);
+[nz,nx,nt]=size(scanfus.Data);
 
 % creates a normalized square window between t0 and t1 
 stim=zeros(nt,1);
@@ -27,18 +27,18 @@ stim=filter(hrf,1,stim);                 % filter the activity by the hrf
 % normalize stim
 stim=stim-mean(stim);
 stim=stim./sqrt(sum(stim.^2));
-
+ny=1;
 c.Data=zeros(nz,nx,ny);
-c.VoxelSize=scanfus.VoxelSize;
-c.Type=scanfus.Type;
-c.Direction=scanfus.Direction;
+% c.VoxelSize=scanfus.VoxelSize;
+% c.Type=scanfus.Type;
+% c.Direction=scanfus.Direction;
 
-for iplane=1:ny
+for iplane=1
     fprintf('correlation plane %d\n',iplane);
     tmp=zeros(nz,nx);
     for iz=1:nz
         for ix=1:nx
-            s=squeeze(scanfus.Data(iz,ix,iplane,:));
+            s=squeeze(scanfus.Data(iz,ix,:));
             s=s-mean(s);
             s=s/sqrt(sum(s.^2));
             tmp(iz,ix)=sum(s.*stim);
