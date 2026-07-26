@@ -6,4 +6,6 @@
 
   The codes used in the paper named "Miniaturized-and-accessible-functional-ultrasound-imaging-system-for-freely-moving-mice"  
 
-  The codes were developed and debugged on MATLAB 2022a  
+  The codes were developed and debugged on MATLAB 2022a 
+
+  The corresponding data of the codes can be obtained from https://doi.org/10.5281/zenodo.17579084.
